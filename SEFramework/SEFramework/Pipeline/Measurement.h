@@ -1,4 +1,5 @@
-/** Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +40,7 @@ public:
   virtual void startThreads() = 0;
   virtual void stopThreads() = 0;
   virtual void synchronizeThreads() = 0;
+  virtual void cancel() = 0;
 };
 
 }

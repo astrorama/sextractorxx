@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,8 +51,6 @@ public:
   virtual ~SourceWithOnDemandProperties() = default;
 
   // removes copy/move constructors and assignment operators
-
-  SourceWithOnDemandProperties(const SourceWithOnDemandProperties&) = delete;
   SourceWithOnDemandProperties& operator=(const SourceWithOnDemandProperties&) = delete;
   SourceWithOnDemandProperties(SourceWithOnDemandProperties&&) = delete;
   SourceWithOnDemandProperties& operator=(SourceWithOnDemandProperties&&) = delete;
@@ -59,20 +58,26 @@ public:
   /// Constructor
   explicit SourceWithOnDemandProperties(std::shared_ptr<const TaskProvider> task_provider);
 
+  void visitProperties(const PropertyVisitor& visitor) override;
+
   // Note : Because the get/setProperty() methods of the SourceInterface are
   // templated, the overrides of the non-templated versions will hide them. For
   // this reason it is necessary to re-introduce the templated methods, which is
   // done by the using statements below.
   using SourceInterface::getProperty;
   using SourceInterface::setProperty;
+
+  std::unique_ptr<SourceInterface> clone() const override;
   
 protected:
   
   // Implementation of SourceInterface
   const Property& getProperty(const PropertyId& property_id) const override;
-  void setProperty(std::unique_ptr<Property> property, const PropertyId& property_id) override;
+  void setProperty(std::shared_ptr<Property> property, const PropertyId& property_id) override;
 
 private:
+  SourceWithOnDemandProperties(const SourceWithOnDemandProperties& other);
+
   std::shared_ptr<const TaskProvider> m_task_provider;
   PropertyHolder m_property_holder;
 }; /* End of Source class */

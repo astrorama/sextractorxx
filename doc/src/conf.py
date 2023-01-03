@@ -134,7 +134,7 @@ numfig = True
 # unit titles (such as .. function::).
 add_module_names = False
 
-autodoc_mock_imports = ['.measurement_images', '_SourceXtractorPy']
+autodoc_mock_imports = ['.measurement_images', '_SEPythonConfig']
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -466,7 +466,7 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 
 # -- Options for pybtex ----------------------------------------------
 bibtex_bibfiles = ["references.bib"]
-    
+
 from packaging import version as vers
 from pybtex import __version__ as pybtex_version
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle, date, pages, toplevel

@@ -1,4 +1,5 @@
-/** Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -70,6 +71,10 @@ public:
 
   unsigned int size() const override;
 
+  void visitProperties(const PropertyVisitor& visitor) override;
+
+  std::unique_ptr<SourceInterface> clone() const override;
+
   using SourceInterface::getProperty;
   using SourceInterface::setProperty;
 
@@ -77,7 +82,7 @@ protected:
 
   const Property& getProperty(const PropertyId& property_id) const override;
 
-  void setProperty(std::unique_ptr<Property> property, const PropertyId& property_id) override;
+  void setProperty(std::shared_ptr<Property> property, const PropertyId& property_id) override;
 
 private:
 
@@ -96,25 +101,29 @@ class SourceGroupWithOnDemandProperties::EntangledSource : public SourceInterfac
 
 public:
 
-  EntangledSource(std::shared_ptr<SourceInterface> source, SourceGroupWithOnDemandProperties& group);
+  EntangledSource(std::unique_ptr<SourceInterface> source, SourceGroupWithOnDemandProperties& group);
 
   virtual ~EntangledSource() = default;
 
   const Property& getProperty(const PropertyId& property_id) const override;
 
-  void setProperty(std::unique_ptr<Property> property, const PropertyId& property_id) override;
+  void setProperty(std::shared_ptr<Property> property, const PropertyId& property_id) override;
+
+  void visitProperties(const PropertyVisitor& visitor) override;
+
+  std::unique_ptr<SourceInterface> clone() const override;
 
   bool operator<(const EntangledSource& other) const;
 
 private:
 
   PropertyHolder m_property_holder;
-  std::shared_ptr<SourceInterface> m_source;
+  std::unique_ptr<SourceInterface> m_source;
   SourceGroupWithOnDemandProperties& m_group;
 
   friend void SourceGroupWithOnDemandProperties::clearGroupProperties();
   friend void SourceGroupWithOnDemandProperties::merge(SourceGroupInterface&&);
-
+  friend std::unique_ptr<SourceInterface> SourceGroupWithOnDemandProperties::clone() const;
 };
 
 } /* namespace SourceXtractor */

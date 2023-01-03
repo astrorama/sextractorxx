@@ -22,7 +22,7 @@ import sys
 import warnings
 from enum import Enum
 
-import _SourceXtractorPy as cpp
+import _SEPythonConfig as cpp
 
 try:
     import pyston

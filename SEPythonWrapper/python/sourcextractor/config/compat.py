@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 import sys
 
-import _SourceXtractorPy as cpp
+import _SEPythonConfig as cpp
 
 from .measurement_config import MeasurementConfig, global_measurement_config
 from .model_fitting import ModelFitting

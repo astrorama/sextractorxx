@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
@@ -15,7 +15,7 @@
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-/* 
+/*
  * @file PythonInterpreter.h
  * @author Nikolaos Apostolakos <nikoapos@gmail.com>
  */
@@ -34,17 +34,20 @@
 namespace SourceXtractor {
 
 class PythonInterpreter {
-  
+
 public:
-  
+
   static PythonInterpreter& getSingleton();
-  
+
   void runFile(const std::string& filename, const std::vector<std::string>& argv);
 
-  void setupContext();
+  /// Capture Python's stdout and stderr and pass the output through the logging
+  void captureOutput();
+
+  void setupContext(boost::python::object config = {});
 
   virtual ~PythonInterpreter();
-  
+
   std::map<int, PyMeasurementImage> getMeasurementImages();
 
   std::map<int, PyAperture> getApertures();
@@ -54,23 +57,23 @@ public:
   std::map<std::string, std::vector<int>> getApertureOutputColumns();
 
   std::map<int, boost::python::object> getConstantParameters();
-  
+
   std::map<int, boost::python::object> getFreeParameters();
-  
+
   std::map<int, boost::python::object> getDependentParameters();
-  
+
   std::map<int, boost::python::object> getPriors();
-  
+
   std::map<int, boost::python::object> getConstantModels();
 
   std::map<int, boost::python::object> getPointSourceModels();
-  
+
   std::map<int, boost::python::object> getSersicModels();
-  
+
   std::map<int, boost::python::object> getExponentialModels();
-  
+
   std::map<int, boost::python::object> getDeVaucouleursModels();
-  
+
   std::map<int, boost::python::object> getOnnxModels();
 
   std::map<int, std::vector<int>> getFrameModelsMap();
@@ -78,7 +81,7 @@ public:
   std::map<std::string, boost::python::object> getModelFittingParams();
 
 private:
-  
+
   PythonInterpreter();
 
   std::map<int, boost::python::object> getMapFromDict(const char* object_name,

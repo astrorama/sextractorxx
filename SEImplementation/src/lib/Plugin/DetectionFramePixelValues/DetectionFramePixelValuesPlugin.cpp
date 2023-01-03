@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/*
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,24 +22,25 @@
  *      Author: mschefer
  */
 
+#include "SEImplementation/Plugin/DetectionFramePixelValues/DetectionFramePixelValuesPlugin.h"
 #include "SEFramework/Plugin/StaticPlugin.h"
-
 #include "SEImplementation/Plugin/DetectionFramePixelValues/DetectionFramePixelValues.h"
 #include "SEImplementation/Plugin/DetectionFramePixelValues/DetectionFramePixelValuesTaskFactory.h"
-
-#include "SEImplementation/Plugin/DetectionFramePixelValues/DetectionFramePixelValuesPlugin.h"
 
 namespace SourceXtractor {
 
 static StaticPlugin<DetectionFramePixelValuesPlugin> detection_frame_pixel_values_plugin;
 
 void DetectionFramePixelValuesPlugin::registerPlugin(PluginAPI& plugin_api) {
-  plugin_api.getTaskFactoryRegistry().registerTaskFactory<DetectionFramePixelValuesTaskFactory, DetectionFramePixelValues>();
+  auto& output_registry = plugin_api.getOutputRegistry();
+  output_registry.registerColumnConverter<DetectionFramePixelValues, std::vector<DetectionImage::PixelType>>(
+      "detection_pixel_values", [](const DetectionFramePixelValues& pixels) { return pixels.getValues(); });
+  plugin_api.getTaskFactoryRegistry()
+      .registerTaskFactory<DetectionFramePixelValuesTaskFactory, DetectionFramePixelValues>();
 }
 
 std::string DetectionFramePixelValuesPlugin::getIdString() const {
   return "";
 }
 
-}
-
+}  // namespace SourceXtractor

@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +15,7 @@
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-/* 
+/*
  * @file PythonModule.cpp
  * @author Nikolaos Apostolakos <nikoapos@gmail.com>
  */
@@ -36,7 +37,7 @@ namespace bp = boost::python;
 
 namespace SourceXtractor {
 
-BOOST_PYTHON_MODULE(_SourceXtractorPy) {
+BOOST_PYTHON_MODULE(_SEPythonConfig) {
 
   bp::class_<PyOutputWrapper, boost::noncopyable>("OutputWrapper",
     "A file-like object used to wrap stdout and stderr", bp::no_init)

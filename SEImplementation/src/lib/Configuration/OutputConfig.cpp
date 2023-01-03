@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -76,13 +77,13 @@ void OutputConfig::preInitialize(const UserValues& args) {
 
 void OutputConfig::initialize(const UserValues& args) {
   m_out_file = args.at(OUTPUT_FILE).as<std::string>();
-  
+
   std::stringstream properties_str {args.at(OUTPUT_PROPERTIES).as<std::string>()};
   std::string name;
   while (std::getline(properties_str, name, ',')) {
     m_output_properties.emplace_back(name);
   }
-  
+
   auto format_name = boost::to_upper_copy(args.at(OUTPUT_FILE_FORMAT).as<std::string>());
   m_format = format_map.at(format_name);
 
@@ -92,15 +93,15 @@ void OutputConfig::initialize(const UserValues& args) {
   m_unsorted = !args.at(OUTPUT_SORTED).as<bool>();
 }
 
-std::string OutputConfig::getOutputFile() {
+std::string OutputConfig::getOutputFile() const {
   return m_out_file;
 }
 
-OutputConfig::OutputFileFormat OutputConfig::getOutputFileFormat() {
+OutputConfig::OutputFileFormat OutputConfig::getOutputFileFormat() const {
   return m_format;
 }
 
-const std::vector<std::string> OutputConfig::getOutputProperties() {
+const std::vector<std::string> OutputConfig::getOutputProperties() const {
   return m_output_properties;
 }
 

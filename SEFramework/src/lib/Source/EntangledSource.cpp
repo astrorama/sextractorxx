@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,16 +25,16 @@
 
 namespace SourceXtractor {
 
-SourceGroupWithOnDemandProperties::EntangledSource::EntangledSource(std::shared_ptr<SourceInterface> source, SourceGroupWithOnDemandProperties& group)
-        : m_source(source), m_group(group) {
+SourceGroupWithOnDemandProperties::EntangledSource::EntangledSource(std::unique_ptr<SourceInterface> source, SourceGroupWithOnDemandProperties& group)
+        : m_source(std::move(source)), m_group(group) {
   // Normally, it should not be possible that the given source is of type
   // EntangledSource, because the entangled sources of a group can only be
   // accessed via the iterator as references. Nevertheless, to be sure that
   // future changes will not change the behavior, we do a check to the given
   // source and if it is an EntangledSource we use its encapsulated source instead.
-  auto entangled_ptr = std::dynamic_pointer_cast<EntangledSource>(m_source);
+  auto entangled_ptr = dynamic_cast<EntangledSource*>(m_source.get());
   if (entangled_ptr != nullptr) {
-    m_source = entangled_ptr->m_source;
+    m_source = std::move(entangled_ptr->m_source);
   }
 }
 
@@ -76,8 +77,13 @@ const Property& SourceGroupWithOnDemandProperties::EntangledSource::getProperty(
 
 } // end of getProperty()
 
-void SourceGroupWithOnDemandProperties::EntangledSource::setProperty(std::unique_ptr<Property> property, const PropertyId& property_id) {
+void SourceGroupWithOnDemandProperties::EntangledSource::setProperty(std::shared_ptr<Property> property,
+                                                                     const PropertyId&         property_id) {
   m_property_holder.setProperty(std::move(property), property_id);
+}
+
+std::unique_ptr<SourceInterface> SourceGroupWithOnDemandProperties::EntangledSource::clone() const {
+  throw Elements::Exception("Can not clone an entangled source");
 }
 
 bool SourceGroupWithOnDemandProperties::EntangledSource::operator<(const EntangledSource& other) const {

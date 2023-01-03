@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +15,7 @@
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-/* 
+/*
  * @file PythonConfig.h
  * @author Nikolaos Apostolakos <nikoapos@gmail.com>
  */
@@ -28,19 +29,22 @@
 namespace SourceXtractor {
 
 class PythonConfig : public Euclid::Configuration::Configuration {
-  
+
 public:
-  
+
   explicit PythonConfig(long manager_id);
-  
+
   std::map<std::string, Configuration::OptionDescriptionList> getProgramOptions() override;
 
   void preInitialize(const UserValues& args) override;
 
   void initialize(const UserValues& args) override;
-  
+
   PythonInterpreter& getInterpreter() const;
 
+private:
+  bool                  m_capture_output = true;
+  boost::python::object m_measurement_config;
 };
 
 }

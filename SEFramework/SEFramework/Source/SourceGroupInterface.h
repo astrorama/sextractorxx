@@ -1,4 +1,5 @@
-/** Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +24,7 @@
 #define _SEFRAMEWORK_SOURCEGROUPINTERFACE_H
 
 #include "SEFramework/Source/SourceInterface.h"
+#include "AlexandriaKernel/memory_tools.h"
 
 namespace SourceXtractor {
 
@@ -34,7 +36,7 @@ namespace SourceXtractor {
  *
  */
 
-class SourceGroupInterface : protected SourceInterface {
+class SourceGroupInterface : public SourceInterface {
 
   template <typename Collection>
   using CollectionType = typename std::iterator_traits<typename Collection::iterator>::value_type;
@@ -54,8 +56,16 @@ public:
       return m_source->getProperty(property_id);
     }
 
-    void setProperty(std::unique_ptr<Property> property, const PropertyId& property_id) override {
+    void setProperty(std::shared_ptr<Property> property, const PropertyId& property_id) override {
       m_source->setProperty(std::move(property), property_id);
+    }
+
+    void visitProperties(const PropertyVisitor& visitor) override {
+      m_source->visitProperties(visitor);
+    }
+
+    std::unique_ptr<SourceInterface> clone() const override {
+      return Euclid::make_unique<SourceWrapper>(m_source->clone());
     }
 
     bool operator<(const SourceWrapper& other) const {
@@ -107,6 +117,7 @@ public:
   using SourceInterface::getProperty;
   using SourceInterface::setProperty;
   using SourceInterface::setIndexedProperty;
+  using SourceInterface::clone;
 
 }; // end of SourceGroupInterface class
 

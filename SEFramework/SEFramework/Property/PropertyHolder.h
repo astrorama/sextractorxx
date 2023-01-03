@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,6 +45,8 @@ class PropertyHolder {
 
 public:
 
+  using const_iterator = std::unordered_map<PropertyId, std::shared_ptr<Property>>::const_iterator;
+
   /// Destructor
   virtual ~PropertyHolder() = default;
 
@@ -60,16 +63,26 @@ public:
   const Property& getProperty(const PropertyId& property_id) const;
 
   /// Sets a property, overwriting it if necessary
-  void setProperty(std::unique_ptr<Property> property, const PropertyId& property_id);
+  void setProperty(std::shared_ptr<Property> property, const PropertyId& property_id);
 
   /// Returns true if the property is set
   bool isPropertySet(const PropertyId& property_id) const;
-  
+
   void clear();
+
+  void update(const PropertyHolder& other);
+
+  const_iterator begin() const {
+    return m_properties.begin();
+  }
+
+  const_iterator end() const {
+    return m_properties.end();
+  }
 
 private:
 
-  std::unordered_map<PropertyId, std::unique_ptr<Property>> m_properties;
+  std::unordered_map<PropertyId, std::shared_ptr<Property>> m_properties;
 
 }; /* End of ObjectWithProperties class */
 

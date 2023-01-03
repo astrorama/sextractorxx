@@ -15,5 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-from _SourceXtractorPy import Flags
 
+from _SEPythonConfig import Flags
+from SOURCEXTRACTORPLUSPLUS_VERSION import SOURCEXTRACTORPLUSPLUS_VERSION_STRING as __version__

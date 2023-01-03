@@ -19,7 +19,7 @@ from __future__ import division, print_function
 
 import sys
 
-import _SourceXtractorPy as cpp
+import _SEPythonConfig as cpp
 
 from .measurement_images import DataCubeSlice, FitsFile, ImageGroup, MeasurementGroup, \
     MeasurementImage
@@ -88,7 +88,7 @@ class MeasurementConfig:
         image_file = FitsFile(image)
         if "image_hdu" in kwargs.keys():
             image_hdu_list = [kwargs.pop("image_hdu")]
-        else:    
+        else:
             image_hdu_list = image_file.hdu_list
 
         # handles the PSFs
@@ -99,8 +99,8 @@ class MeasurementConfig:
             psf_hdu_list = [0] * len(psf_file_list)
         else:
             if "psf_hdu" in kwargs.keys():
-                psf_hdu_list = [kwargs.pop("psf_hdu")] * len(image_hdu_list) 
-            else:    
+                psf_hdu_list = [kwargs.pop("psf_hdu")] * len(image_hdu_list)
+            else:
                 psf_hdu_list = range(len(image_hdu_list))
             psf_file_list = [psf] * len(image_hdu_list)
 
@@ -117,7 +117,7 @@ class MeasurementConfig:
             weight_file = FitsFile(weight)
             if "weight_hdu" in kwargs.keys():
                 weight_hdu_list = [kwargs.pop("weight_hdu")] * len(image_hdu_list)
-            else:    
+            else:
                 weight_hdu_list = weight_file.hdu_list
             weight_file_list = [weight_file] * len(image_hdu_list)
 

@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +38,7 @@ const Property& PropertyHolder::getProperty(const PropertyId& property_id) const
   }
 }
 
-void PropertyHolder::setProperty(std::unique_ptr<Property> property, const PropertyId& property_id) {
+void PropertyHolder::setProperty(std::shared_ptr<Property> property, const PropertyId& property_id) {
   m_properties[property_id] = std::move(property);
 }
 
@@ -47,6 +48,10 @@ bool PropertyHolder::isPropertySet(const PropertyId& property_id) const {
 
 void PropertyHolder::clear() {
   m_properties.clear();
+}
+
+void PropertyHolder::update(const SourceXtractor::PropertyHolder& other) {
+  std::copy(other.m_properties.begin(), other.m_properties.end(), std::inserter(m_properties, m_properties.begin()));
 }
 
 } // SEFramework namespace

@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/*
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +52,7 @@ std::shared_ptr<Task> FlexibleModelFittingTaskFactory::createTask(const Property
 
 void FlexibleModelFittingTaskFactory::reportConfigDependencies(Euclid::Configuration::ConfigManager& manager) const {
   manager.registerConfiguration<ModelFittingConfig>();
+  manager.registerConfiguration<SamplingConfig>();
 }
 
 void FlexibleModelFittingTaskFactory::configure(Euclid::Configuration::ConfigManager& manager) {

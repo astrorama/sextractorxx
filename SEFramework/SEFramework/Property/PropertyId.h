@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/*
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +40,8 @@ namespace SourceXtractor {
 
 class PropertyId {
 public:
+  PropertyId(std::type_index type_id, unsigned int index) : m_type_id(type_id), m_index(index) {}
+
   /// Templated factory method used to create a PropertyId based on the type of a property.
   /// An optional index parameter is used to make the distinction between several properties of the same type.
   template<typename T>
@@ -74,12 +77,9 @@ public:
   std::string getString() const;
 
 private:
-  PropertyId(std::type_index type_id, unsigned int index) : m_type_id(type_id), m_index(index) {}
 
   std::type_index m_type_id;
   unsigned int m_index;
-
-
   friend struct std::hash<SourceXtractor::PropertyId>;
 };
 

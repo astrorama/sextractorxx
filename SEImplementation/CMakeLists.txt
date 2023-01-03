@@ -96,6 +96,7 @@ elements_add_library(SEImplementation
             src/lib/Image/*.cpp
             ${COMMON_SRC}
             src/lib/Prefetcher/*.cpp
+            src/lib/Property/*.cpp
             ${PLUGIN_SRC}
             ${SE_PYTHON_SRC}
             LINK_LIBRARIES
@@ -110,7 +111,7 @@ elements_add_library(SEImplementation
 #===============================================================================
 # SEImplementation has a part that needs to be reachable from Python.
 #===============================================================================
-elements_add_python_module(SourceXtractorPy
+elements_add_python_module(SEPythonConfig
 		src/lib/PythonConfig/PythonModule.cpp
 		LINK_LIBRARIES SEImplementation
 		INCLUDE_DIRS ${Boost_INCLUDE_DIR} ${PYTHON_INCLUDE_DIRS}
@@ -222,7 +223,6 @@ elements_add_unit_test(AssocMode_test tests/src/Plugin/AssocMode/AssocMode_test.
 #  elements_install_python_modules()
 #  elements_install_scripts()
 #===============================================================================
-elements_install_python_modules()
 
 #===============================================================================
 # Add the elements_install_conf_files macro

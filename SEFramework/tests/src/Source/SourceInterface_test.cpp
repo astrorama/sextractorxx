@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +52,13 @@ public:
   using SourceInterface::setProperty;
 
   MOCK_CONST_METHOD1(getProperty, Property& (const PropertyId& property_id));
-  void setProperty(std::unique_ptr<Property>, const PropertyId& ) {}
+  void setProperty(std::shared_ptr<Property>, const PropertyId& ) {}
+
+  void visitProperties(const PropertyVisitor&) override {}
+
+  std::unique_ptr<SourceInterface> clone() const override {
+    return nullptr;
+  }
 };
 
 //-----------------------------------------------------------------------------

@@ -1,4 +1,5 @@
-/** Copyright © 2019 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
+/**
+ * Copyright © 2019-2022 Université de Genève, LMU Munich - Faculty of Physics, IAP-CNRS/Sorbonne Université
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -53,11 +54,11 @@ public:
 
   void initialize(const UserValues& args) override;
   
-  std::string getOutputFile();
+  std::string getOutputFile() const;
   
-  OutputFileFormat getOutputFileFormat();
+  OutputFileFormat getOutputFileFormat() const;
   
-  const std::vector<std::string> getOutputProperties();
+  const std::vector<std::string> getOutputProperties() const;
 
   size_t getFlushSize() const;
 

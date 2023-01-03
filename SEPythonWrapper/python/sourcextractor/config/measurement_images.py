@@ -21,7 +21,7 @@ import os
 import re
 import sys
 
-import _SourceXtractorPy as cpp
+import _SEPythonConfig as cpp
 
 if sys.version_info.major < 3:
     from StringIO import StringIO
