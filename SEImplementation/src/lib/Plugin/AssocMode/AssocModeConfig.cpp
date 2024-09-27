@@ -49,7 +49,7 @@ static const std::string ASSOC_FILTER { "assoc-filter" };
 static const std::string ASSOC_COPY { "assoc-copy" };
 static const std::string ASSOC_COLUMNS { "assoc-columns" };
 static const std::string ASSOC_COORD_TYPE { "assoc-coord-type" };
-static const std::string ASSOC_SOURCE_SIZES { "assoc-source-sizes" };
+static const std::string ASSOC_SOURCE_SIZES { "assoc-source-sizes" }; // FIXME width/height
 static const std::string ASSOC_DEFAULT_PIXEL_SIZE { "assoc-default-pixel-size" };
 static const std::string ASSOC_GROUP_ID { "assoc-group-id" };
 static const std::string ASSOC_CONFIG { "assoc-config" };
@@ -103,7 +103,8 @@ std::vector<int> parseColumnList(const std::string& arg) {
 }
 
 AssocModeConfig::AssocModeConfig(long manager_id) : Configuration(manager_id), m_assoc_mode(AssocMode::UNKNOWN),
-    m_assoc_radius(0.), m_default_pixel_size(10), m_pixel_size_column(-1), m_group_id_column(-1) {
+    m_assoc_radius(0.), m_default_pixel_size(10), m_pixel_width_column(-1), m_pixel_height_column(-1),
+    m_group_id_column(-1) {
   declareDependency<DetectionImageConfig>();
   declareDependency<PartitionStepConfig>();
 
@@ -208,7 +209,8 @@ void AssocModeConfig::readConfigFromParams(const UserValues& args) {
   m_columns =  parseColumnList(args.at(ASSOC_COLUMNS).as<std::string>());
   m_columns_idx = parseColumnList(args.at(ASSOC_COPY).as<std::string>());
 
-  m_pixel_size_column = args.at(ASSOC_SOURCE_SIZES).as<int>() - 1; // config uses 1 as first column
+  m_pixel_width_column = args.at(ASSOC_SOURCE_SIZES).as<int>() - 1; // config uses 1 as first column
+  m_pixel_height_column = args.at(ASSOC_SOURCE_SIZES).as<int>() - 1; // config uses 1 as first column
   m_group_id_column = args.at(ASSOC_GROUP_ID).as<int>() - 1; // config uses 1 as first column
 
   m_assoc_coord_type = getCoordinateType(args);
@@ -253,7 +255,8 @@ void AssocModeConfig::readConfigFromFile(const std::string& filename) {
   }
 
   if (m_assoc_columns.find("pixel_size") != m_assoc_columns.end()) {
-    m_pixel_size_column = m_assoc_columns.at("pixel_size");
+    m_pixel_width_column = m_assoc_columns.at("pixel_size");
+    m_pixel_height_column = m_assoc_columns.at("pixel_size");
     m_assoc_columns.erase("pixel_size");
   }
 
@@ -386,10 +389,13 @@ std::vector<AssocModeConfig::CatalogEntry> AssocModeConfig::readTable(
       catalog.back().group_id = boost::apply_visitor(CastVisitor<int64_t>{}, row[m_group_id_column]);
     }
 
-    if (m_pixel_size_column >= 0) {
-      catalog.back().source_radius_pixels = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_size_column]);
+    if (m_pixel_width_column >= 0 && m_pixel_height_column >= 0) {
+      //catalog.back().source_radius_pixels = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_size_column]);
+      catalog.back().source_pixel_width = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_width_column]);
+      catalog.back().source_pixel_height = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_height_column]);
     } else {
-      catalog.back().source_radius_pixels = m_default_pixel_size;
+      catalog.back().source_pixel_width = m_default_pixel_size;
+      catalog.back().source_pixel_height = m_default_pixel_size;
     }
   }
   return catalog;
@@ -461,8 +467,11 @@ void AssocModeConfig::printConfig() {
   if (m_columns.size() >= 3) {
     std::cout << "WEIGHT" << "\t";
   }
-  if (m_pixel_size_column >= 0) {
-    std::cout << "PIXEL_SIZE" << "\t";
+  if (m_pixel_width_column >= 0) {
+    std::cout << "PIXEL_WIDTH" << "\t";
+  }
+  if (m_pixel_height_column >= 0) {
+    std::cout << "PIXEL_HEIGHT" << "\t";
   }
   if (m_group_id_column >= 0) {
     std::cout << "GROUP_ID" << "\t";
@@ -485,8 +494,11 @@ void AssocModeConfig::printConfig() {
     if (m_columns.size() >= 3) {
       std::cout << entry.weight << "\t";
     }
-    if (m_pixel_size_column >= 0) {
-      std::cout << entry.source_radius_pixels << "\t";
+    if (m_pixel_width_column >= 0) {
+      std::cout << entry.source_pixel_width << "\t";
+    }
+    if (m_pixel_height_column >= 0) {
+      std::cout << entry.source_pixel_height << "\t";
     }
     if (m_group_id_column >= 0) {
       std::cout << entry.group_id << "\t";

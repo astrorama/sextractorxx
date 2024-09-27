@@ -126,7 +126,12 @@ std::shared_ptr<VectorImage<SeFloat>> createWeightImage(SourceInterface& source,
     for (int x = 0; x < rect.getWidth(); x++) {
       auto back_var = variance_map->getValue(rect.getTopLeft().m_x + x, rect.getTopLeft().m_y + y);
       auto pixel_val = frame_image->getValue(rect.getTopLeft().m_x + x, rect.getTopLeft().m_y + y);
-      if (saturation > 0 && pixel_val > saturation) {
+
+      auto dx =  x - rect.getWidth() / 2.0;
+      auto dy =  y - rect.getHeight() / 2.0;
+      auto rad = std::min(rect.getWidth() / 2.0, rect.getHeight() / 2.0);
+
+      if (dx*dx + dy*dy > rad*rad && saturation > 0 && pixel_val > saturation) {
         weight->at(x, y) = 0;
       }
       else if (gain > 0.0 && pixel_val > 0.0) {
@@ -137,7 +142,6 @@ std::shared_ptr<VectorImage<SeFloat>> createWeightImage(SourceInterface& source,
       }
     }
   }
-
 
   return weight;
 }

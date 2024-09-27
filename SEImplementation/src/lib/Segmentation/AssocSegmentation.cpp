@@ -32,7 +32,7 @@ void AssocSegmentation::labelImage(Segmentation::LabellingListener& listener, st
     source->setProperty<SourceId>();
     source->setProperty<WorldCentroid>(source_coordinate.world_coord.m_alpha, source_coordinate.world_coord.m_delta);
     source->setProperty<AssocMode>(true, source_coordinate.assoc_columns,
-        source_coordinate.source_radius_pixels, source_coordinate.group_id);
+        source_coordinate.source_pixel_width, source_coordinate.source_pixel_height, source_coordinate.group_id);
 
     listener.publishSource(std::move(source));
   }

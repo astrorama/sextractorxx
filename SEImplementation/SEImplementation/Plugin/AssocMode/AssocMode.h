@@ -40,13 +40,15 @@ public:
    */
   virtual ~AssocMode() = default;
 
-  AssocMode() : m_has_assoc(false), m_assoc_data(std::vector<size_t>({0})), m_ref_frame_pixel_radius(1), m_group_id(0) {
+  AssocMode() : m_has_assoc(false), m_assoc_data(std::vector<size_t>({0})),
+      m_ref_frame_pixel_width(1), m_ref_frame_pixel_height(1), m_group_id(0) {
   }
 
   AssocMode(bool has_assoc, const std::vector<double>& assoc_data,
-      double ref_frame_pixel_radius=0.0, unsigned int group_id=0) :
+      double ref_frame_pixel_width=0.0, double ref_frame_pixel_height=0.0, unsigned int group_id=0) :
       m_has_assoc(has_assoc), m_assoc_data(std::vector<size_t>({assoc_data.size()})),
-      m_ref_frame_pixel_radius(ref_frame_pixel_radius), m_group_id(group_id) {
+      m_ref_frame_pixel_width(ref_frame_pixel_width), m_ref_frame_pixel_height(ref_frame_pixel_height),
+      m_group_id(group_id) {
     for (size_t i=0; i<assoc_data.size(); i++) {
       m_assoc_data.at(i) = assoc_data[i];
     }
@@ -60,8 +62,16 @@ public:
     return m_assoc_data;
   }
 
-  double getRefFramePixelRadius() const {
-    return m_ref_frame_pixel_radius;
+//  double getRefFramePixelRadius() const {
+//    return m_ref_frame_pixel_radius;
+//  }
+//
+  double getRefFramePixelWidth() const {
+    return m_ref_frame_pixel_width;
+  }
+
+  double getRefFramePixelHeight() const {
+    return m_ref_frame_pixel_height;
   }
 
   unsigned int getGroupId() const {
@@ -72,7 +82,9 @@ private:
   bool m_has_assoc;
 
   NdArray<SeFloat> m_assoc_data;
-  double m_ref_frame_pixel_radius;
+  //double m_ref_frame_pixel_radius;
+  double m_ref_frame_pixel_width;
+  double m_ref_frame_pixel_height;
   unsigned int m_group_id;
 };
 

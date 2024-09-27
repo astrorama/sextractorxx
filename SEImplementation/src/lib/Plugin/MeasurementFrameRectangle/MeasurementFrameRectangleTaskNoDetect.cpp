@@ -40,12 +40,15 @@ void MeasurementFrameRectangleTaskNoDetect::computeProperties(SourceInterface& s
   bool bad_coordinates = false;
   ImageCoordinate coord1, coord2, coord3, coord4;
   try {
-    int sz = assoc_mode.getRefFramePixelRadius();
+    //int sz = assoc_mode.getRefFramePixelRadius();
+    int w = assoc_mode.getRefFramePixelWidth() / 2.0;
+    int h = assoc_mode.getRefFramePixelHeight() / 2.0;
+
     auto c = measurement_frame_coordinates->worldToImage(coord);
-    coord1 = ImageCoordinate(c.m_x - sz, c.m_y - sz);
-    coord2 = ImageCoordinate(c.m_x + sz, c.m_y - sz);
-    coord3 = ImageCoordinate(c.m_x - sz, c.m_y + sz);
-    coord4 = ImageCoordinate(c.m_x + sz, c.m_y + sz);
+    coord1 = ImageCoordinate(c.m_x - w, c.m_y - h);
+    coord2 = ImageCoordinate(c.m_x + w, c.m_y - h);
+    coord3 = ImageCoordinate(c.m_x - w, c.m_y + h);
+    coord4 = ImageCoordinate(c.m_x + w, c.m_y + h);
   }
   catch (const InvalidCoordinatesException&) {
     bad_coordinates = true;
