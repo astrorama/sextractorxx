@@ -64,9 +64,10 @@ template<typename T>
 void QuadTree<T>::remove(const T& data) {
   if (m_is_divided) {
     auto c = Coord { Traits::getCoord(data, 0), Traits::getCoord(data, 1) };
-    auto quad = getQuadrant(c);
-    if (m_sub_trees[quad] != nullptr) {
-      m_sub_trees[quad]->remove(data);
+    for (int i=0; i<4; i++) {
+      if (m_sub_trees[i] != nullptr && m_sub_trees[i]->isContained(c)) {
+        m_sub_trees[i]->remove(data);
+      }
     }
   } else {
     auto it = std::find(m_data.begin(), m_data.end(), data);

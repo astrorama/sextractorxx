@@ -62,12 +62,14 @@ void MoffatGrouping::receiveSource(std::unique_ptr<SourceInterface> source) {
   // Encapsulates the source unique_ptr
   auto& centroid = source->getProperty<PixelCentroid>();
 
+  // Creates a SourceInfo to contain the unique_ptr to the source, coordinates and group_id
   auto source_info = std::make_shared<SourceInfo>();
   source_info->m_source = std::move(source);
   source_info->m_x = centroid.getCentroidX();
   source_info->m_y = centroid.getCentroidY();
   source_info->m_group_id = m_group_counter++;
 
+  // Make a group containing only the source
   auto group = std::make_shared<Group>();
   group->push_back(source_info);
   m_groups[source_info->m_group_id] = group;
