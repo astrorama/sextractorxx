@@ -47,6 +47,7 @@ static const std::string CHECK_PSF { "check-image-psf" };
 static const std::string CHECK_ML_DETECTION { "check-image-ml-detection" };
 static const std::string CHECK_MEASUREMENT_BACKGROUND { "check-image-measurement-background" };
 static const std::string CHECK_MEASUREMENT_VARIANCE { "check-image-measurement-variance" };
+static const std::string CHECK_FITTING_WINDOW { "check-image-fitting-window" };
 
 static const std::string CHECK_MOFFAT { "debug-image-moffat" };
 
@@ -89,7 +90,9 @@ std::map<std::string, Configuration::OptionDescriptionList> CheckImagesConfig::g
         "Path to save the ML detection check images"}
       }}, {"Debug options (Use with caution!)", {
       {CHECK_MOFFAT.c_str(), po::value<std::string>()->default_value(""),
-        "Path to save the moffat debug image (VERY SLOW)"}
+        "Path to save the moffat debug image (VERY SLOW)"},
+      {CHECK_FITTING_WINDOW.c_str(), po::value<std::string>()->default_value(""),
+        "Path to save the model fitting window check image"}
   }}};
 }
 
@@ -111,6 +114,7 @@ void CheckImagesConfig::initialize(const UserValues& args) {
   m_moffat_filename = args.find(CHECK_MOFFAT)->second.as<std::string>();
   m_psf_filename = args.find(CHECK_PSF)->second.as<std::string>();
   m_ml_detection_filename = args.find(CHECK_ML_DETECTION)->second.as<std::string>();
+  m_fitting_window_filename = args.find(CHECK_FITTING_WINDOW)->second.as<std::string>();
 }
 
 } // SourceXtractor namespace

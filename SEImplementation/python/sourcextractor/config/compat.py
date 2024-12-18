@@ -119,3 +119,14 @@ def set_modified_chi_squared_scale(scale):
 @_compat_doc_helper(copy_doc_from=ModelFitting.use_iterative_fitting)
 def use_iterative_fitting(use):
     global_measurement_config.model_fitting.use_iterative_fitting(use)
+
+
+@_compat_doc_helper(copy_doc_from=ModelFitting.set_window_type)
+def set_window_type(window_type):
+    global_measurement_config.model_fitting.set_window_type(window_type)
+
+@_compat_doc_helper(copy_doc_from=ModelFitting.set_ellipse_scale)
+def set_ellipse_scale(ellipse_scale):
+    global_measurement_config.model_fitting.set_ellipse_scale(ellipse_scale)
+
+

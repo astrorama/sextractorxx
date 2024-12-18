@@ -50,6 +50,8 @@ static const std::string ASSOC_COPY { "assoc-copy" };
 static const std::string ASSOC_COLUMNS { "assoc-columns" };
 static const std::string ASSOC_COORD_TYPE { "assoc-coord-type" };
 static const std::string ASSOC_SOURCE_SIZES { "assoc-source-sizes" };
+static const std::string ASSOC_SOURCE_WIDTHS { "assoc-source-widths" };
+static const std::string ASSOC_SOURCE_HEIGHTS { "assoc-source-heights" };
 static const std::string ASSOC_DEFAULT_PIXEL_SIZE { "assoc-default-pixel-size" };
 static const std::string ASSOC_GROUP_ID { "assoc-group-id" };
 static const std::string ASSOC_CONFIG { "assoc-config" };
@@ -103,7 +105,8 @@ std::vector<int> parseColumnList(const std::string& arg) {
 }
 
 AssocModeConfig::AssocModeConfig(long manager_id) : Configuration(manager_id), m_assoc_mode(AssocMode::UNKNOWN),
-    m_assoc_radius(0.), m_default_pixel_size(10), m_pixel_size_column(-1), m_group_id_column(-1) {
+    m_assoc_radius(0.), m_default_pixel_size(10), m_pixel_width_column(-1), m_pixel_height_column(-1),
+    m_group_id_column(-1), m_assoc_coord_type(AssocCoordType::PIXEL) {
   declareDependency<DetectionImageConfig>();
   declareDependency<PartitionStepConfig>();
 
@@ -129,6 +132,10 @@ std::map<std::string, Configuration::OptionDescriptionList> AssocModeConfig::get
           "Assoc coordinates type: PIXEL, WORLD"},
       {ASSOC_SOURCE_SIZES.c_str(), po::value<int>()->default_value(-1),
           "Column containing the source sizes (in reference frame pixels)"},
+      {ASSOC_SOURCE_WIDTHS.c_str(), po::value<int>()->default_value(-1),
+          "Column containing the source widths (in reference frame pixels)"},
+      {ASSOC_SOURCE_HEIGHTS.c_str(), po::value<int>()->default_value(-1),
+          "Column containing the source heights (in reference frame pixels)"},
       {ASSOC_DEFAULT_PIXEL_SIZE.c_str(), po::value<double>()->default_value(5.0),
           "Default source size (in reference frame pixels)"},
       {ASSOC_GROUP_ID.c_str(), po::value<int>()->default_value(-1),
@@ -208,7 +215,16 @@ void AssocModeConfig::readConfigFromParams(const UserValues& args) {
   m_columns =  parseColumnList(args.at(ASSOC_COLUMNS).as<std::string>());
   m_columns_idx = parseColumnList(args.at(ASSOC_COPY).as<std::string>());
 
-  m_pixel_size_column = args.at(ASSOC_SOURCE_SIZES).as<int>() - 1; // config uses 1 as first column
+  m_pixel_width_column = args.at(ASSOC_SOURCE_SIZES).as<int>() - 1; // config uses 1 as first column
+  m_pixel_height_column = args.at(ASSOC_SOURCE_SIZES).as<int>() - 1; // config uses 1 as first column
+
+  if (args.find(ASSOC_SOURCE_WIDTHS) != args.end()) {
+    m_pixel_width_column = args.at(ASSOC_SOURCE_WIDTHS).as<int>() - 1; // config uses 1 as first column
+  }
+  if (args.find(ASSOC_SOURCE_HEIGHTS) != args.end()) {
+    m_pixel_height_column = args.at(ASSOC_SOURCE_HEIGHTS).as<int>() - 1; // config uses 1 as first column
+  }
+
   m_group_id_column = args.at(ASSOC_GROUP_ID).as<int>() - 1; // config uses 1 as first column
 
   m_assoc_coord_type = getCoordinateType(args);
@@ -253,8 +269,19 @@ void AssocModeConfig::readConfigFromFile(const std::string& filename) {
   }
 
   if (m_assoc_columns.find("pixel_size") != m_assoc_columns.end()) {
-    m_pixel_size_column = m_assoc_columns.at("pixel_size");
+    m_pixel_width_column = m_assoc_columns.at("pixel_size");
+    m_pixel_height_column = m_assoc_columns.at("pixel_size");
     m_assoc_columns.erase("pixel_size");
+  }
+
+  if (m_assoc_columns.find("pixel_width") != m_assoc_columns.end()) {
+    m_pixel_width_column = m_assoc_columns.at("pixel_width");
+    m_assoc_columns.erase("pixel_width");
+  }
+
+  if (m_assoc_columns.find("pixel_height") != m_assoc_columns.end()) {
+    m_pixel_width_column = m_assoc_columns.at("pixel_height");
+    m_assoc_columns.erase("pixel_height");
   }
 
   if (m_assoc_columns.find("group_id") != m_assoc_columns.end()) {
@@ -361,7 +388,7 @@ std::vector<AssocModeConfig::CatalogEntry> AssocModeConfig::readTable(
         world_coord = coordinate_system->imageToWorld(coord);
       }
     }
-    catalog.emplace_back(CatalogEntry { coord, world_coord, 1.0, {}, 1.0, 0 });
+    catalog.emplace_back(CatalogEntry { coord, world_coord, 1.0, {}, 1.0, 1.0, 0 });
     if (columns.size() == 3 && columns.at(2) >= 0) {
       catalog.back().weight = boost::apply_visitor(CastVisitor<double>{}, row[columns.at(2)]);
     }
@@ -386,10 +413,13 @@ std::vector<AssocModeConfig::CatalogEntry> AssocModeConfig::readTable(
       catalog.back().group_id = boost::apply_visitor(CastVisitor<int64_t>{}, row[m_group_id_column]);
     }
 
-    if (m_pixel_size_column >= 0) {
-      catalog.back().source_radius_pixels = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_size_column]);
+    if (m_pixel_width_column >= 0 && m_pixel_height_column >= 0) {
+      //catalog.back().source_radius_pixels = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_size_column]);
+      catalog.back().source_pixel_width = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_width_column]);
+      catalog.back().source_pixel_height = boost::apply_visitor(CastVisitor<double>{}, row[m_pixel_height_column]);
     } else {
-      catalog.back().source_radius_pixels = m_default_pixel_size;
+      catalog.back().source_pixel_width = m_default_pixel_size;
+      catalog.back().source_pixel_height = m_default_pixel_size;
     }
   }
   return catalog;
@@ -399,7 +429,7 @@ std::map<std::string, unsigned int>  AssocModeConfig::parseConfigFile(const std:
     std::map<std::string, unsigned int> columns;
 
     const std::vector<std::string> reserved_names {
-      "x", "y", "ra", "dec", "weight", "group_id", "source_radius_pixel"
+      "x", "y", "ra", "dec", "weight", "group_id", "pixel_size", "pixel_width", "pixel_height"
     };
 
     std::ifstream config_file(filename);
@@ -461,8 +491,11 @@ void AssocModeConfig::printConfig() {
   if (m_columns.size() >= 3) {
     std::cout << "WEIGHT" << "\t";
   }
-  if (m_pixel_size_column >= 0) {
-    std::cout << "PIXEL_SIZE" << "\t";
+  if (m_pixel_width_column >= 0) {
+    std::cout << "PIXEL_WIDTH" << "\t";
+  }
+  if (m_pixel_height_column >= 0) {
+    std::cout << "PIXEL_HEIGHT" << "\t";
   }
   if (m_group_id_column >= 0) {
     std::cout << "GROUP_ID" << "\t";
@@ -485,8 +518,11 @@ void AssocModeConfig::printConfig() {
     if (m_columns.size() >= 3) {
       std::cout << entry.weight << "\t";
     }
-    if (m_pixel_size_column >= 0) {
-      std::cout << entry.source_radius_pixels << "\t";
+    if (m_pixel_width_column >= 0) {
+      std::cout << entry.source_pixel_width << "\t";
+    }
+    if (m_pixel_height_column >= 0) {
+      std::cout << entry.source_pixel_height << "\t";
     }
     if (m_group_id_column >= 0) {
       std::cout << entry.group_id << "\t";

@@ -28,6 +28,7 @@
 #include "SEImplementation/Plugin/FlexibleModelFitting/FlexibleModelFittingTaskFactory.h"
 
 #include "SEImplementation/Configuration/ModelFittingConfig.h"
+
 #include "SEImplementation/Configuration/SamplingConfig.h"
 
 namespace SourceXtractor {
@@ -39,7 +40,7 @@ std::shared_ptr<Task> FlexibleModelFittingTaskFactory::createTask(const Property
     if (m_use_iterative_fitting) {
       return std::make_shared<FlexibleModelFittingIterativeTask>(m_least_squares_engine, m_max_iterations,
           m_modified_chi_squared_scale, m_parameters, m_frames, m_priors, m_scale_factor,
-          m_meta_iterations, m_deblend_factor, m_meta_iteration_stop, m_max_fit_size);
+          m_meta_iterations, m_deblend_factor, m_meta_iteration_stop, m_max_fit_size, m_window_type, m_ellipse_scale);
     } else {
       return std::make_shared<FlexibleModelFittingTask>(m_least_squares_engine, m_max_iterations,
           m_modified_chi_squared_scale, m_parameters, m_frames, m_priors, m_scale_factor);
@@ -74,6 +75,8 @@ void FlexibleModelFittingTaskFactory::configure(Euclid::Configuration::ConfigMan
   m_meta_iterations = model_fitting_config.getMetaIterations();
   m_deblend_factor = model_fitting_config.getDeblendFactor();
   m_meta_iteration_stop = model_fitting_config.getMetaIterationStop();
+  m_window_type = model_fitting_config.getWindowType();
+  m_ellipse_scale = model_fitting_config.getEllipseScale();
 
   std::string approach;
   if (m_use_iterative_fitting) {
@@ -84,7 +87,8 @@ void FlexibleModelFittingTaskFactory::configure(Euclid::Configuration::ConfigMan
 
   logger.info() << "Using engine " << m_least_squares_engine << " with the "
                 << approach << " implementation and "
-                << m_max_iterations << " maximum number of iterations";
+                << m_max_iterations << " maximum number of iterations, window type: "
+                << static_cast<int>(m_window_type);
 
   m_outputs = model_fitting_config.getOutputs();
 

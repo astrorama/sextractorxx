@@ -45,6 +45,10 @@ public:
     return m_model_fitting_filename;
   }
 
+  const std::string& getFittingWindowImageFilename() const {
+    return m_fitting_window_filename;
+  }
+
   const std::string& getModelFittingResidualFilename() const {
     return m_model_fitting_residual_filename;
   }
@@ -112,6 +116,7 @@ public:
 private:
 
   std::string m_model_fitting_filename;
+  std::string m_fitting_window_filename;
   std::string m_model_fitting_residual_filename;
   std::string m_background_filename;
   std::string m_variance_filename;

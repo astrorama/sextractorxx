@@ -85,6 +85,7 @@ void CheckImages::configure(Euclid::Configuration::ConfigManager& manager) {
   auto& config = manager.getConfiguration<CheckImagesConfig>();
 
   m_model_fitting_image_filename = config.getModelFittingImageFilename();
+  m_fitting_window_image_filename = config.getFittingWindowImageFilename();
   m_residual_filename = config.getModelFittingResidualFilename();
   m_background_filename = config.getBackgroundFilename();
   m_variance_filename = config.getVarianceFilename();
@@ -172,11 +173,11 @@ void CheckImages::configure(Euclid::Configuration::ConfigManager& manager) {
 }
 
 std::shared_ptr<WriteableImage<int>> CheckImages::getMeasurementAutoApertureImage(unsigned int frame_number) {
+  std::lock_guard<std::mutex> lock{m_access_mutex};
+
   if (m_auto_aperture_filename.empty()) {
     return nullptr;
   }
-
-  std::lock_guard<std::mutex> lock{m_access_mutex};
 
   auto i = m_measurement_auto_aperture_images.find(frame_number);
   if (i == m_measurement_auto_aperture_images.end()) {
@@ -199,11 +200,11 @@ std::shared_ptr<WriteableImage<int>> CheckImages::getMeasurementAutoApertureImag
 }
 
 std::shared_ptr<WriteableImage<int>> CheckImages::getMeasurementApertureImage(unsigned int frame_number) {
+  std::lock_guard<std::mutex> lock{m_access_mutex};
+
   if (m_aperture_filename.empty()) {
     return nullptr;
   }
-
-  std::lock_guard<std::mutex> lock{m_access_mutex};
 
   auto i = m_measurement_aperture_images.find(frame_number);
   if (i == m_measurement_aperture_images.end()) {
@@ -227,11 +228,11 @@ std::shared_ptr<WriteableImage<int>> CheckImages::getMeasurementApertureImage(un
 
 std::shared_ptr<WriteableImage<MeasurementImage::PixelType>>
 CheckImages::getModelFittingImage(unsigned int frame_number) {
+  std::lock_guard<std::mutex> lock{m_access_mutex};
+
   if (m_model_fitting_image_filename.empty() && m_residual_filename.empty()) {
     return nullptr;
   }
-
-  std::lock_guard<std::mutex> lock{m_access_mutex};
 
   auto i = m_check_image_model_fitting.find(frame_number);
   if (i == m_check_image_model_fitting.end()) {
@@ -260,12 +261,39 @@ CheckImages::getModelFittingImage(unsigned int frame_number) {
   return LockedWriteableImage<MeasurementImage::PixelType>::create(i->second);
 }
 
-std::shared_ptr<WriteableImage<MeasurementImage::PixelType>> CheckImages::getPsfImage(unsigned int frame_number) {
-  if (m_psf_filename.empty()) {
+std::shared_ptr<WriteableImage<int>>
+CheckImages::getFittingWindowImage(unsigned int frame_number) {
+  std::lock_guard<std::mutex> lock{m_access_mutex};
+
+  if (m_fitting_window_image_filename.empty()) {
     return nullptr;
   }
 
+  auto i = m_check_image_fitting_window.find(frame_number);
+  if (i == m_check_image_fitting_window.end()) {
+    auto& frame_info = m_measurement_frames.at(frame_number);
+    auto filename = m_fitting_window_image_filename.stem();
+    filename += "_" + frame_info.m_label;
+    filename += m_fitting_window_image_filename.extension();
+    auto frame_filename = m_fitting_window_image_filename.parent_path() / filename;
+    auto writeable_image = FitsWriter::newImage<int>(
+      frame_filename.native(),
+      frame_info.m_width,
+      frame_info.m_height,
+      frame_info.m_coordinate_system
+    );
+    i = m_check_image_fitting_window.emplace(std::make_pair(frame_number, writeable_image)).first;
+  }
+  return LockedWriteableImage<int>::create(i->second);
+}
+
+
+std::shared_ptr<WriteableImage<MeasurementImage::PixelType>> CheckImages::getPsfImage(unsigned int frame_number) {
   std::lock_guard<std::mutex> lock{m_access_mutex};
+
+  if (m_psf_filename.empty()) {
+    return nullptr;
+  }
 
   auto i = m_check_image_psf.find(frame_number);
   if (i == m_check_image_psf.end()) {
@@ -289,12 +317,11 @@ std::shared_ptr<WriteableImage<MeasurementImage::PixelType>> CheckImages::getPsf
 
 std::shared_ptr<WriteableImage<MeasurementImage::PixelType>>
     CheckImages::getMLDetectionImage(unsigned int plane_number, size_t index) {
+  std::lock_guard<std::mutex> lock{m_access_mutex};
 
   if (m_ml_detection_filename.empty()) {
     return nullptr;
   }
-
-  std::lock_guard<std::mutex> lock{m_access_mutex};
 
   auto i = m_check_image_ml_detection.at(index).find(plane_number);
   if (i == m_check_image_ml_detection.at(index).end()) {

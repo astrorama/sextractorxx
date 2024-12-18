@@ -80,7 +80,7 @@ AssocModeConfig::CatalogEntry getAssocEntryMaxImpl(const std::vector<AssocModeCo
 }
 
 AssocModeConfig::CatalogEntry getAssocEntryMeanImpl(const std::vector<AssocModeConfig::CatalogEntry>& entries) {
-  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}};
+  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}, 0., 0., 0};
   result.assoc_columns.resize(entries.front().assoc_columns.size());
   double total_weight = 0.0;
   for (auto& entry : entries) {
@@ -98,7 +98,7 @@ AssocModeConfig::CatalogEntry getAssocEntryMeanImpl(const std::vector<AssocModeC
 }
 
 AssocModeConfig::CatalogEntry getAssocEntrySumImpl(const std::vector<AssocModeConfig::CatalogEntry>& entries) {
-  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}};
+  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}, 0., 0., 0};
   result.assoc_columns.resize(entries.front().assoc_columns.size());
   for (auto& entry : entries) {
     for (size_t i=0; i < result.assoc_columns.size(); i++) {
@@ -109,7 +109,7 @@ AssocModeConfig::CatalogEntry getAssocEntrySumImpl(const std::vector<AssocModeCo
 }
 
 AssocModeConfig::CatalogEntry getAssocEntryMagMeanImpl(const std::vector<AssocModeConfig::CatalogEntry>& entries) {
-  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}};
+  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}, 0., 0., 0};
   result.assoc_columns.resize(entries.front().assoc_columns.size());
   double total_weight = 0.0;
   for (auto& entry : entries) {
@@ -128,7 +128,7 @@ AssocModeConfig::CatalogEntry getAssocEntryMagMeanImpl(const std::vector<AssocMo
 }
 
 AssocModeConfig::CatalogEntry getAssocEntryMagSumImpl(const std::vector<AssocModeConfig::CatalogEntry>& entries) {
-  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}};
+  AssocModeConfig::CatalogEntry result{{}, {}, 0., {}, 0., 0., 0};
   result.assoc_columns.resize(entries.front().assoc_columns.size());
   for (auto& entry : entries) {
     for (size_t i=0; i < result.assoc_columns.size(); i++) {

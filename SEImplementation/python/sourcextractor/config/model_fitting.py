@@ -1034,6 +1034,16 @@ def get_world_parameters(x, y, radius, angle, ratio):
 
     return ra, dec, wc_rad, wc_angle, wc_ratio
 
+class WindowType(Enum):
+    RECTANGLE = 1
+    SQUARE_MIN = 2
+    SQUARE_MAX = 3
+    SQUARE_AREA = 4
+    DISK_MIN = 5
+    DISK_MAX = 6
+    DISK_AREA = 7
+    ALIGNED_ELLIPSE = 8
+    ROTATED_ELLIPSE = 9
 
 class ModelFitting:
     def __init__(self):
@@ -1050,7 +1060,9 @@ class ModelFitting:
         self.onnx_model_dict = {}
         self.params_dict = {"max_iterations": 200, "modified_chi_squared_scale": 10, "engine": "",
                             "use_iterative_fitting": True, "meta_iterations": 5,
-                            "deblend_factor": 0.95, "meta_iteration_stop": 0.0001}
+                            "deblend_factor": 0.95, "meta_iteration_stop": 0.0001,
+                            "window_type": WindowType.RECTANGLE, "ellipse_scale": 3.0
+                            }
 
     def _set_model_to_frames(self, group, model):
         for x in group:
@@ -1217,6 +1229,31 @@ class ModelFitting:
 
         """
         self.params_dict["meta_iteration_stop"] = meta_iteration_stop
+        
+    def set_window_type(self, window_type):
+        """
+        Parameters
+        ----------
+        
+        window_type : WindowType
+            specify the type of model fitting window
+
+        """
+        if type(window_type) != WindowType:
+            raise TypeError("Window type must be a WindowType enum value!")
+        
+        self.params_dict["window_type"] = window_type
+
+    def set_ellipse_scale(self, ellipse_scale):
+        """
+        Parameters
+        ----------
+        
+        ellipse_scale : double
+            specify scaling of elliptic footprints 
+
+        """
+        self.params_dict["ellipse_scale"] = ellipse_scale
 
 
 def print_model_fitting_info(group, show_params=False, prefix='', file=sys.stderr):

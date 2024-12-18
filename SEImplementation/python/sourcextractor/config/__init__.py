@@ -26,4 +26,4 @@ from .model_fitting import (ComputeGraphModel, ConstantModel, ConstantParameter,
                             get_flux_parameter, get_pos_parameters, get_position_angle,
                             get_separation_angle, get_world_parameters,
                             get_world_position_parameters, pixel_to_world_coordinate,
-                            print_model_fitting_info, radius_to_wc_angle, ModelFitting)
+                            print_model_fitting_info, radius_to_wc_angle, ModelFitting, WindowType)

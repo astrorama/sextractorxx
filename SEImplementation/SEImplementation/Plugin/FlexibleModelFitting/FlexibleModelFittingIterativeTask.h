@@ -26,8 +26,7 @@
 
 #include "SEFramework/Image/VectorImage.h"
 #include "SEFramework/Task/GroupTask.h"
-
-//#include "SEImplementation/Configuration/SamplingConfig.h"
+#include "SEFramework/Source/SourceFlags.h"
 
 #include "SEImplementation/Plugin/FlexibleModelFitting/FlexibleModelFittingParameter.h"
 #include "SEImplementation/Plugin/FlexibleModelFitting/FlexibleModelFittingFrame.h"
@@ -38,6 +37,18 @@ namespace SourceXtractor {
 class FlexibleModelFittingIterativeTask : public GroupTask {
 
 public:
+  enum class WindowType {
+    RECTANGLE = 1,
+    SQUARE_MIN = 2,
+    SQUARE_MAX = 3,
+    SQUARE_AREA = 4,
+    DISK_MIN = 5,
+    DISK_MAX = 6,
+    DISK_AREA = 7,
+    ALIGNED_ELLIPSE = 8,
+    ROTATED_ELLIPSE = 9
+  };
+
   FlexibleModelFittingIterativeTask(const std::string &least_squares_engine,
       unsigned int max_iterations, double modified_chi_squared_scale,
       std::vector<std::shared_ptr<FlexibleModelFittingParameter>> parameters,
@@ -47,7 +58,9 @@ public:
       int meta_iterations=3,
       double deblend_factor=1.0,
       double meta_iteration_stop=0.0001,
-      size_t max_fit_size=100
+      size_t max_fit_size=100,
+      WindowType window_type = WindowType::RECTANGLE,
+      double ellipse_scale=3.0
       );
 
   virtual ~FlexibleModelFittingIterativeTask();
@@ -75,9 +88,21 @@ private:
     std::vector<SourceState> source_states;
   };
 
+  struct FittingEllipse {
+    double m_x;
+    double m_y;
+    double m_a;
+    double m_b;
+    double m_theta;
+  };
+
+  PixelRectangle getFittingRect(SourceInterface& source, int frame_index) const;
   std::shared_ptr<VectorImage<SeFloat>> createDeblendImage(
       SourceGroupInterface& group, SourceInterface& source, int source_index,
       std::shared_ptr<FlexibleModelFittingFrame> frame, FittingState& state) const;
+  std::shared_ptr<VectorImage<SeFloat>> createWeightImage(SourceInterface& source, int frame_index) const;
+  bool isFrameValid(SourceInterface& source, int frame_index) const;
+  std::shared_ptr<VectorImage<SeFloat>> createImageCopy(SourceInterface& source, int frame_index) const;
 
   void fitSource(SourceGroupInterface& group, SourceInterface& source, int index, FittingState& state) const;
   void updateCheckImages(SourceGroupInterface& group, double pixel_scale, FittingState& state) const;
@@ -97,6 +122,12 @@ private:
       SeFloat avg_reduced_chi_squared, SeFloat duration, unsigned int iterations, unsigned int stop_reason, Flags flags,
       ModelFitting::LeastSquareSummary solution,
       int index, FittingState& state) const;
+  FlexibleModelFittingIterativeTask::FittingEllipse getFittingEllipse(SourceInterface& source, int frame_index) const;
+  PixelRectangle getEllipseRect(FittingEllipse ellipse) const;
+  FlexibleModelFittingIterativeTask::FittingEllipse transformEllipse(
+      FittingEllipse ellipse, SourceInterface& source, int frame_index) const;
+  PixelRectangle clipFittingRect(PixelRectangle fitting_rect, SourceInterface& source, int frame_index) const;
+  PixelRectangle getUnclippedFittingRect(SourceInterface& source, int frame_index) const;
 
   // Task configuration
   std::string m_least_squares_engine;
@@ -111,6 +142,9 @@ private:
   std::vector<std::shared_ptr<FlexibleModelFittingParameter>> m_parameters;
   std::vector<std::shared_ptr<FlexibleModelFittingFrame>> m_frames;
   std::vector<std::shared_ptr<FlexibleModelFittingPrior>> m_priors;
+
+  WindowType m_window_type { WindowType::RECTANGLE };
+  double m_ellipse_scale = 3.0;
 };
 
 }

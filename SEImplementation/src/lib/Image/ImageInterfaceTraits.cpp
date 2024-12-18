@@ -157,7 +157,7 @@ float interpolate_pix(float *pix, float x, float y,
 
   kwidth = interp_kernwidth[interptype];
 
-//-- Get the integer part of the current coordinate or nearest neighbour
+  //-- Get the integer part of the current coordinate or nearest neighbour
   if (interptype == INTERP_NEARESTNEIGHBOUR) {
     ix = (int) (x - 0.50001);
     iy = (int) (y - 0.50001);
@@ -167,17 +167,18 @@ float interpolate_pix(float *pix, float x, float y,
     iy = (int) y;
   }
 
-//-- Store the fractional part of the current coordinate
+  //-- Store the fractional part of the current coordinate
   dx = x - ix;
   dy = y - iy;
-//-- Check if interpolation start/end exceed image boundary
+  //-- Check if interpolation start/end exceed image boundary
   ix -= kwidth / 2;
   iy -= kwidth / 2;
   if (ix < 0 || ix + kwidth <= 0 || ix + kwidth > xsize ||
-      iy < 0 || iy + kwidth <= 0 || iy + kwidth > ysize)
+      iy < 0 || iy + kwidth <= 0 || iy + kwidth > ysize) {
     return 0.0;
+  }
 
-//-- First step: interpolate along NAXIS1 from the data themselves
+  //-- First step: interpolate along NAXIS1 from the data themselves
   make_kernel(dx, kernel, interptype);
   step = xsize - kwidth;
   pixin = pix + iy * xsize + ix; // Set starting pointer
@@ -185,19 +186,21 @@ float interpolate_pix(float *pix, float x, float y,
   for (j = kwidth; j--;) {
     val = 0.0;
     kvector = kernel;
-    for (i = kwidth; i--;)
+    for (i = kwidth; i--;) {
       val += *(kvector++) * *(pixin++);
+    }
     *(pixout++) = val;
     pixin += step;
   }
 
-//-- Second step: interpolate along NAXIS2 from the interpolation buffer
+  //-- Second step: interpolate along NAXIS2 from the interpolation buffer
   make_kernel(dy, kernel, interptype);
   pixin = buffer;
   val = 0.0;
   kvector = kernel;
-  for (i = kwidth; i--;)
+  for (i = kwidth; i--;) {
     val += *(kvector++) * *(pixin++);
+  }
 
   return val;
 }
@@ -242,11 +245,6 @@ void shiftResizeLancszos(const ImageInterfaceTypePtr& source, ImageInterfaceType
   auto data = &source->getData()[0];
   auto source_width = source->getWidth();
   auto source_height = source->getHeight();
-
-//  static int counter = 0;
-//  std::cout << (counter += window_width*window_height)  << " " << window_width << " " << window_height << "\n";
-//  static int counter2 = 0;
-//  std::cout << (counter2 += source_width*source_height)  <<  "\n";
 
   for (int x_win = 0; x_win < window_width; x_win++) {
     float x = (x_win + 0.5 - x_shift) / scale_factor + 0.5;
@@ -334,8 +332,6 @@ void ModelFitting::ImageTraits<ImageInterfaceTypePtr>::addImageToImage(
   // Create the scaled and shifted window
   auto window = factory(window_width, window_height);
 
-  //shiftResize(source_image, window, scale_factor, x_shift, y_shift);
-  //shiftResizeLancszos(source_image, window, scale_factor, x_shift, y_shift);
   shiftResizeLancszosFast(source_image, window, scale_factor, x_shift, y_shift);
 
   // We need to correct the window for the scaling, so it has the same integral
